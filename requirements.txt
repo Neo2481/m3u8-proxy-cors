@@ -1,3 +1,5 @@
 requests==2.31.0
 fastapi==0.103.0
-uvicorn~=0.23.2
+uvicorn==0.23.2
+python-dotenv==1.0.1  # For environment variable management
+httpx==0.26.0  # Alternative to requests (better async support for FastAPI)
