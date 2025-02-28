@@ -1,34 +1,29 @@
-name: Deploy to Cloudflare
+name: Deploy FastAPI to Cloudflare
 
 on:
   push:
     branches:
-      - main  # Change to your deployment branch
-  workflow_dispatch:  # Allow manual deployment
+      - main
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
-      - name: Install Wrangler CLI
-        run: |
-          npm install -g wrangler
-
-      - name: Authenticate with Cloudflare
-        run: |
-          echo "CLOUDFLARE_API_TOKEN=${{ secrets.CF_API_TOKEN }}" >> $GITHUB_ENV
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
       - name: Build and Push Docker Image
         run: |
-          docker build -t fastapi-app .
-          docker tag fastapi-app registry.cloudflare.com/${{ secrets.CF_ACCOUNT_ID }}/fastapi-app
-          echo "${{ secrets.CF_API_TOKEN }}" | docker login registry.cloudflare.com -u "${{ secrets.CF_ACCOUNT_ID }}" --password-stdin
-          docker push registry.cloudflare.com/${{ secrets.CF_ACCOUNT_ID }}/fastapi-app
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/fastapi-app:latest .
+          docker push ${{ secrets.DOCKER_USERNAME }}/fastapi-app:latest
 
       - name: Deploy to Cloudflare
         run: |
-          wrangler deploy
+          curl -X POST "https://api.cloudflare.com/client/v4/zones/${{ secrets.CF_ZONE_ID }}/workers/script" \
+            -H "Authorization: Bearer ${{ secrets.CF_API_TOKEN }}" \
+            -H "Content-Type: application/javascript" \
+            --data-binary @cloudflare-deploy-script.js
