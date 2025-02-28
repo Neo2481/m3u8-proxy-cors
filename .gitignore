@@ -1,6 +1,27 @@
+# Ignore Node.js dependencies and external static assets
 /node_modules/
 /static/external_assets/
+
+# Ignore Python cache and compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore local development and IDE settings
 .idea/
+.vscode/
+*.log
+
+# Ignore static private assets
 /static/private_assets/
+
+# Ignore compressed files
 *.zip
+
+# Ignore Vercel-related files (not needed for Cloudflare)
 .vercel
+
+# Ignore Cloudflare build-related files (if using Workers or Pages)
+.wrangler/
+.cloudflare/
