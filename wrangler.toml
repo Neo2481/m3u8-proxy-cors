@@ -1,0 +1,24 @@
+name = "fastapi-app"
+type = "webpack"
+account_id = "YOUR_CLOUDFLARE_ACCOUNT_ID"
+workers_dev = true
+compatibility_date = "2024-03-01"
+
+[[services]]
+name = "fastapi-docker"
+external = true
+docker_image = "registry.cloudflare.com/YOUR_ACCOUNT_ID/fastapi-app"
+
+[vars]
+PORT = "8080"
+origins = "*"
+
+[build]
+command = "docker build -t fastapi-app ."
+
+[deploy]
+command = "docker push registry.cloudflare.com/YOUR_ACCOUNT_ID/fastapi-app"
+
+[dev]
+command = "uvicorn main:app --host 0.0.0.0 --port 8080 --reload"
+port = 8080
